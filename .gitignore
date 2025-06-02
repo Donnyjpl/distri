@@ -1,0 +1,30 @@
+# Entorno virtual
+distri/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Archivos de entorno o configuración
+*.env
+.env
+
+# Archivos de bases de datos
+*.sqlite3
+
+# Archivos de logs
+*.log
+
+# Archivos de migraciones (opcional)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Archivos generados por el editor (VS Code, PyCharm, etc.)
+.vscode/
+.idea/
+
+# Archivos de caché o temporales
+.DS_Store
+Thumbs.db
