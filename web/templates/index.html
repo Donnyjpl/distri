@@ -1,0 +1,293 @@
+{% extends 'baset.html' %}
+{% load custom_filters %}
+{% block title %} TBK{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Start Banner Hero -->
+<div id="template-mo-zay-hero-carousel" class="carousel slide" data-bs-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="0" class="active"></li>
+        <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="1"></li>
+        <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="container">
+                <div class="row p-5">
+                    <div class="mx-auto col-md-8 col-lg-6 order-lg-last">
+                        <div class="carousel-image-container">
+                            <img class="img-fluid" src="{% static 'img/banner1.png' %}" alt="">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-0 d-flex align-items-center">
+                        <div class="text-align-left align-self-center">
+                            <h1 class="h1 text-success"><b>Bienvenida a</b> TBK</h1>
+                            <h3 class="h2">Tu tienda online de moda para todas las ocasiones</h3>
+                            <p>
+                                En TBK, nos dedicamos a ofrecer lo mejor de la moda con una amplia selección de ropa
+                                de marca de alta calidad. Somos una tienda virtual que te brinda una experiencia de
+                                compra cercana y personalizada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="container">
+                <div class="row p-5">
+                    <div class="mx-auto col-md-8 col-lg-6 order-lg-last">
+                        <div class="carousel-image-container">
+                            <img class="img-fluid" src=" {% static 'img/banner2.png' %}" alt="">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-0 d-flex align-items-center">
+                        <div class="text-align-left">
+                            <h1 class="h1">Explorar la Tienda</h1>
+                            <h3 class="h2">
+                                <!-- Botón para ir a la tienda -->
+                                <a href="{% url 'shop' %}" class="btn btn-lg btn-success shadow-sm">Explorar la
+                                    Tienda</a></h3>
+                            <p>
+                                ¿Estás lista para tu próxima compra? ¡Explora nuestras colecciones y encuentra tu
+                                look perfecto!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="container">
+                <div class="row p-5">
+                    <div class="mx-auto col-md-8 col-lg-6 order-lg-last">
+                        <div class="carousel-image-container">
+                            <img class="img-fluid" src="{% static 'img/banner3.png' %}" alt="">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-0 d-flex align-items-center">
+                        <div class="text-align-left">
+                            <h1 class="h1">Tendencias de Moda</h1>
+                            <h3 class="h2">Revoluciona tu closet con lo último en estilo.</h3>
+                            <p>
+                                Desde ropa casual hasta elegante, tenemos todo lo que necesitas para que luzcas
+                                espectacular.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="carousel-control-prev text-decoration-none w-auto ps-3" href="#template-mo-zay-hero-carousel"
+        role="button" data-bs-slide="prev">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    <a class="carousel-control-next text-decoration-none w-auto pe-3" href="#template-mo-zay-hero-carousel"
+        role="button" data-bs-slide="next">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</div>
+<!-- End Banner Hero -->
+    <!-- End Banner Hero -->
+
+
+    <!-- Start Categories of The Month -->
+    <section class="container py-5">
+        <div class="row text-center pt-3">
+            <div class="col-lg-6 m-auto">
+                <h1 class="h1">Categorías del Mes</h1>
+                <p>
+                    Explora las categorías destacadas de este mes, con productos exclusivos para ti.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 p-5 mt-3">
+                <a href="{% url 'shop' %}"><img src=" {% static 'img/shop_03.jpg' %}"
+                        class="rounded-circle img-fluid border"></a>
+                <h5 class="text-center mt-3 mb-3">Vestidos y Enteritos</h5>
+                <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Explorar</a></p>
+            </div>
+            <div class="col-12 col-md-4 p-5 mt-3">
+                <a href="{% url 'shop' %}"><img src=" {% static 'img/tamara.jpg' %}"
+                        class="rounded-circle img-fluid border"></a>
+                <h2 class="h5 text-center mt-3 mb-3">Poleras, Blusas , Tops y Bodys</h2>
+                <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Explorar</a></p>
+            </div>
+            <div class="col-12 col-md-4 p-5 mt-3">
+                <a href="{% url 'shop' %}"><img src=" {% static 'img/banner3.png' %}"
+                        class="rounded-circle img-fluid border"></a>
+                <h2 class="h5 text-center mt-3 mb-3">Accesorios</h2>
+                <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Explorar</a></p>
+            </div>
+        </div>
+    </section>
+    <!-- End Categories of The Month -->
+    <!-- Start Productos Destacados -->
+    <!-- Start Productos Destacados -->
+    <section class="container py-5">
+        <div class="row text-center pt-3">
+            <div class="col-lg-6 m-auto">
+                <h1 class="h1">Productos Destacados</h1>
+                <p>
+                    Productos especialmente seleccionados para ti, diseñados para resaltar tu estilo único.
+                </p>
+            </div>
+        </div>
+
+        <div class="row mt-5 justify-content-center">
+            {% for producto in productos_destacados %}
+
+            <div class="col-md-4 col-lg-4 mt-5">
+                <div class="card mb-4 tbk-product-card">
+                    <!-- Imagen con overlay mejorado -->
+                    <div class="tbk-product-img-container">
+                        {% if producto.imagenes.first %}
+                        <img class="tbk-product-img" src="{{ producto.imagenes.first.imagen.url }}"
+                            alt="{{ producto.nombre }}">
+                        {% else %}
+                        <img class="tbk-product-img" src="{% static 'img/default-product.jpg' %}"
+                            alt="{{ producto.nombre }}">
+                        {% endif %}
+
+                        <!-- Overlay con efectos hover -->
+                        <div class="tbk-product-overlay">
+                            <div class="tbk-product-actions">
+                                <a class="tbk-action-btn" title="Añadir a favoritos"
+                                    href="{% url 'agregar_a_favoritos' slug=producto.slug %}">
+                                    <i class="far fa-heart text-danger"></i>
+                                </a>
+                                <a class="tbk-action-btn" title="Ver detalles"
+                                    href="{% url 'producto_detalle' slug=producto.slug %}">
+                                    <i class="far fa-eye text-primary"></i>
+                                </a>
+                                <a class="tbk-action-btn" title="Añadir al carrito"
+                                    href="{% url 'agregar_al_carrito' slug=producto.slug %}">
+                                    <i class="fas fa-cart-plus text-success"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido de la card -->
+                    <div class="card-body d-flex flex-column">
+                        <a href="{% url 'producto_detalle' producto.slug %}" class="tbk-product-title">
+                            {{ producto.nombre|title }}
+                        </a>
+
+                        <!-- Valoraciones con estrellas -->
+                        <div class="tbk-product-rating">
+                            <div class="tbk-product-stars">
+                                {% for i in rango_estrellas %}
+                                {% if i <= producto.promedio_valoracion %}
+                                <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="tbk-product-reviews">
+                                {{ producto.opiniones_list.count }} Reseñas
+                            </span>
+                        </div>
+
+                        <!-- Tallas disponibles con diseño mejorado -->
+                        <div class="tbk-product-sizes">
+                            <span class="tbk-size-label">Tallas:</span>
+                            <div class="tbk-size-badges">
+                                {% if producto.tallas.all %}
+                                {% for producto_talla in producto.tallas.all %}
+                                <span class="tbk-size-badge">{{ producto_talla.talla|upper }}</span>
+                                {% endfor %}
+                                {% else %}
+                                <span class="text-danger small">No disponible</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Precio con diseño destacado -->
+                        <div class="tbk-product-footer">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    {% if producto.tiene_descuento %}
+                                        <div class="price-container">
+                                            <span class="tbk-product-price">${{ producto.precio_con_descuento|formatear_precio }}</span>
+                                            <span class="text-decoration-line-through text-muted ms-2 fs-6">${{ producto.precio|formatear_precio }}</span>
+                                            <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="tbk-product-price">${{ producto.precio|formatear_precio }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-auto">
+                                    <a href="{% url 'agregar_al_carrito' slug=producto.slug %}" class="tbk-buy-button">
+                                        <i class="fas fa-shopping-cart me-1"></i> Comprar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+    <style>
+
+/* Estilos para mejorar el carrusel */
+.carousel-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+    padding: 10px;
+}
+
+.carousel-image-container img {
+    border-radius: 20px;
+    transition: transform 0.5s ease;
+}
+
+.carousel-image-container:hover img {
+    transform: scale(1.03);
+}
+
+/* Personaliza el fondo del carrusel si lo deseas */
+#template-mo-zay-hero-carousel {
+    background-color: #f8f9fa; /* Color de fondo claro */
+}
+
+/* Mejora los controles del carrusel */
+.carousel-control-prev, 
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-control-prev:hover, 
+.carousel-control-next:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Mejora los indicadores */
+.carousel-indicators li {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+    </style>
+{% endblock  %}

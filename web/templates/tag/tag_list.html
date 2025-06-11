@@ -1,0 +1,40 @@
+{% extends 'baset.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Lista de Tags</h1>
+
+    <!-- Botón de Crear Categoría -->
+    <div class="text-end mb-4">
+        <a href="{% url 'tag_create' %}" class="btn btn-success">Crear Nuevo Tag</a>
+    </div>
+
+    <!-- Tabla de Categorías -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
+                <tr>
+                    <td>{{ tag.nombre }}</td>
+                    <td>
+                        <a href="{% url 'tag_edit' tag.pk %}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a href="{% url 'tag_delete' tag.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este Tag?');">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

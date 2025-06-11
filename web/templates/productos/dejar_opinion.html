@@ -1,0 +1,26 @@
+{% extends 'baset.html' %}
+
+{% block content %}
+{% if messages %}
+<div class=" alert alert-success container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+    <h2>Deja tu opinión sobre el producto: {{ producto.nombre }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-success">Enviar Opinión</button>
+    </form>
+
+    <h3>Valoración Promedio: {{ producto.promedio_valoracion }}</h3>
+
+    <a href="{% url 'detalle_producto' slug=producto.slug %}">Volver al producto</a>
+{% endblock %}

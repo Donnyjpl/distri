@@ -1,0 +1,201 @@
+{% extends 'baset.html' %}
+{% load custom_filters %}
+{% block title %}TBK-shop{% endblock %}
+
+{% block content %}
+{% load static %}
+{% if messages %}
+<div class="alert alert-success container">
+    {% for message in messages %}
+    <p>{{ message|title }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+<!-- Start Content -->
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar de filtros -->
+        <div class="col-lg-3">
+            <form method="GET" action="">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <!-- Mostrar el formulario de filtros -->
+                <button type="submit" class="btn btn-success mt-4">Filtrar</button>
+            </form>
+        </div>
+
+        <!-- Productos -->
+        <div class="col-lg-9">
+            <!-- Menú superior con categorías y ordenación -->
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-inline shop-top-menu pb-3 pt-1">
+                        <!-- Enlace para mostrar todos los productos -->
+                        <li class="list-inline-item">
+                            <a class="h3 text-dark text-decoration-none mr-3" href="?">Todos</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 pb-4">
+                    <div class="d-flex">
+                        <select class="form-control" onchange="window.location.href = this.value;">
+                            <!-- Ordenación de los productos -->
+                            <option value="?order_by=name" {% if request.GET.order_by == 'name' %}selected{% endif %}>De
+                                la A a la Z</option>
+                            <option value="?order_by=item" {% if request.GET.order_by == 'item' %}selected{% endif %}>
+                                Item</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos - IMPORTANTE: Añadimos la estructura de fila aquí -->
+            <div class="row">
+                {% for producto in productos %}
+                <div class="col-md-4 col-lg-4 mt-5">
+                    <div class="card mb-4 tbk-product-card">
+                        <!-- Imagen con overlay mejorado -->
+                        <div class="tbk-product-img-container">
+                            {% if producto.imagenes.first %}
+                            <img class="tbk-product-img" src="{{ producto.imagenes.first.imagen.url }}"
+                                alt="{{ producto.nombre }}">
+                            {% else %}
+                            <img class="tbk-product-img" src="{% static 'img/default-product.jpg' %}"
+                                alt="{{ producto.nombre }}">
+                            {% endif %}
+
+                            <!-- Overlay con efectos hover -->
+                            <div class="tbk-product-overlay">
+                                <div class="tbk-product-actions">
+                                    <a class="tbk-action-btn" title="Añadir a favoritos"
+                                        href="{% url 'agregar_a_favoritos' slug=producto.slug %}">
+                                        <i class="far fa-heart text-danger"></i>
+                                    </a>
+                                    <a class="tbk-action-btn" title="Ver detalles"
+                                        href="{% url 'producto_detalle' slug=producto.slug %}">
+                                        <i class="far fa-eye text-primary"></i>
+                                    </a>
+                                    <a class="tbk-action-btn" title="Añadir al carrito"
+                                        href="{% url 'agregar_al_carrito' slug=producto.slug %}">
+                                        <i class="fas fa-cart-plus text-success"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contenido de la card -->
+                        <div class="card-body d-flex flex-column">
+                            <a href="{% url 'producto_detalle' producto.slug %}" class="tbk-product-title">
+                                {{ producto.nombre|title }}
+                            </a>
+
+                            <!-- Valoraciones con estrellas -->
+                            <div class="tbk-product-rating">
+                                <div class="tbk-product-stars">
+                                    {% for i in rango_estrellas %}
+                                    {% if i <= producto.promedio_valoracion %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="tbk-product-reviews">
+                                    {{ producto.opiniones_list.count }} Reseñas
+                                </span>
+                            </div>
+
+                            <!-- Tallas disponibles con diseño mejorado -->
+                            <div class="tbk-product-sizes">
+                                <span class="tbk-size-label">Tallas:</span>
+                                <div class="tbk-size-badges">
+                                    {% if producto.tallas.all %}
+                                    {% for producto_talla in producto.tallas.all %}
+                                    <span class="tbk-size-badge">{{ producto_talla.talla|upper }}</span>
+                                    {% endfor %}
+                                    {% else %}
+                                    <span class="text-danger small">No disponible</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Precio con diseño destacado -->
+                            <div class="tbk-product-footer">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        {% if producto.tiene_descuento %}
+                                            <div class="price-container">
+                                                <span class="tbk-product-price">${{ producto.precio_con_descuento|formatear_precio }}</span>
+                                                <span class="text-decoration-line-through text-muted ms-2 fs-6">${{ producto.precio|formatear_precio }}</span>
+                                                <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="tbk-product-price">${{ producto.precio|formatear_precio }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-auto">
+                                        <a href="{% url 'agregar_al_carrito' slug=producto.slug %}" class="tbk-buy-button">
+                                            <i class="fas fa-shopping-cart me-1"></i> Comprar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page=1&categoria={{ form.categoria.value }}&min_precio={{ form.min_precio.value }}&max_precio={{ form.max_precio.value }}"
+                            aria-label="Primera">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}&categoria={{ form.categoria.value }}&min_precio={{ form.min_precio.value }}&max_precio={{ form.max_precio.value }}"
+                            aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo;&laquo;</span></li>
+                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link"
+                            href="?page={{ num }}&categoria={{ form.categoria.value }}&min_precio={{ form.min_precio.value }}&max_precio={{ form.max_precio.value }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ page_obj.next_page_number }}&categoria={{ form.categoria.value }}&min_precio={{ form.min_precio.value }}&max_precio={{ form.max_precio.value }}"
+                            aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,3 +1,155 @@
 from django.db import models
 
 # Create your models here.
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils.text import slugify  # Utilidad para crear el slug automáticamente
+import uuid
+from django.db import models
+from django.utils.text import slugify
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    rut = models.CharField(max_length=12, unique=True)  # RUT (Ej: 12.345.678-9)
+    telefono = models.CharField(max_length=15,unique=True)  # Teléfono
+    direccion = models.CharField(max_length=255)  # Dirección
+    acepta_terminos = models.BooleanField(default=False)  # Campo para aceptar términos y condiciones
+
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+    
+
+
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Tag(models.Model):
+    nombre = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.nombre
+
+class Ingrediente(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Producto(models.Model):
+    sku = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=255)
+    marca = models.CharField(max_length=100, null=True, blank=True)
+    descripcion = models.TextField(max_length=1000, null=True, blank=True)
+    instrucciones = models.TextField(null=True, blank=True, help_text="Cómo consumir el producto")
+    presentacion = models.CharField(max_length=255, null=True, blank=True, help_text="Ej: Botella de 600ml")
+    precio = models.IntegerField()
+    descuento = models.IntegerField(default=0, help_text="Porcentaje de descuento (0-100)")
+    slug = models.SlugField(unique=True, blank=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    ingredientes = models.ManyToManyField(Ingrediente, blank=True)
+    activo = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug or (self.pk and self.sku != Producto.objects.get(pk=self.pk).sku):
+            self.slug = slugify(self.sku)
+        super().save(*args, **kwargs)
+    @property
+    def precio_con_descuento(self):
+        return int(self.precio * (1 - self.descuento / 100)) if self.descuento else self.precio
+
+    @property
+    def tiene_descuento(self):
+        return self.descuento > 0
+
+    def __str__(self):
+        return f"{self.nombre} ({self.sku})"
+
+class ProductoImagen(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to='productos/')
+
+    def __str__(self):
+        return f"Imagen de {self.producto.nombre}"
+
+    
+class OpinionCliente(models.Model):
+        producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='opiniones')
+        user = models.ForeignKey(User, on_delete=models.CASCADE)  # opinion la venta con un usuario
+        opinion = models.TextField()
+        valoracion = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+        created_at = models.DateTimeField(auto_now_add=True)  # Campo para la fecha de creación
+
+        def __str__(self):
+            return f'Opinión de {self.user.username} sobre {self.producto.nombre}'  # Acceso al nombre del producto usando self.producto.name
+
+class Pago(models.Model):
+    ESTADO_CHOICES = (
+        ('pendiente', 'Pendiente'),
+        ('confirmado', 'Confirmado'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pago {self.id} - {self.estado}"
+
+
+class Venta(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relacionamos la venta con un usuario
+    fecha = models.DateTimeField(auto_now_add=True)  # Fecha de la venta
+    total = models.DecimalField(max_digits=10, decimal_places=0, default=0)  # Total de la venta, calculado automáticamente
+    pago = models.OneToOneField(Pago, null=True, blank=True, on_delete=models.SET_NULL)  # Relacionamos con el pago (uno a uno)
+    envio = models.CharField(max_length=20, choices=[('envio', 'Envío a domicilio'), ('retiro', 'Retiro en tienda')], default='envio')
+
+    def calcular_total(self):
+        """Método para calcular el total de la venta sumando los subtotales de las líneas de venta"""
+        self.total = sum(linea.subtotal() for linea in self.lineas.all())
+        self.save()
+
+    def __str__(self):
+        return f"Venta {self.id} - Usuario: {self.user.username}"
+    
+    def save(self, *args, **kwargs):
+        """El número de control es el ID de la venta"""
+        super().save(*args, **kwargs)  # Guardamos primero para generar el ID
+    
+    
+class LineaVenta(models.Model):
+    venta = models.ForeignKey('Venta', on_delete=models.CASCADE, related_name='lineas')  # Relaciona con la venta principal
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)  # El producto vendido
+    cantidad = models.PositiveIntegerField()  # Cantidad de este producto en la venta
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=0)  # Precio por unidad al momento de la venta
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.cantidad} unidades"
+
+    def subtotal(self):
+        """Calcula el subtotal de esta línea de venta (cantidad * precio_unitario)"""
+        return round(self.cantidad * self.precio_unitario)
+    @property
+    def total_formateado(self):
+        """Devuelve el total formateado"""
+        return f"{self.subtotal()}"  # Si deseas un formato diferente, cámbialo aquí
+
+    
+class Contacto(models.Model):
+    contact_form_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    customer_name = models.CharField(max_length=64)
+    customer_email = models.EmailField()
+    message = models.TextField()
+    contacted = models.BooleanField(default=False)  # Campo para indicar si el mensaje ha sido contactado
+    date_contacted = models.DateTimeField(null=True, blank=True)  # Fecha y hora en que se contactó al cliente 
+  
+    def __str__(self):
+        return f"Formulario de Contacto - {self.contact_form_uuid}"
+    
+

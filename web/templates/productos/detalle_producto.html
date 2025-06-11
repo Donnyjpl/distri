@@ -1,0 +1,46 @@
+{% extends "baset.html" %}
+{% load static %}
+{% block content %}
+  <h2>{{ producto.nombre }} ({{ producto.sku }})</h2>
+
+  <p><strong>Precio:</strong> ${{ producto.precio_con_descuento }}
+     {% if producto.tiene_descuento %}
+        <span style="color:red;">(Descuento: {{ producto.descuento }}%)</span>
+     {% endif %}
+  </p>
+
+  <p><strong>Marca:</strong> {{ producto.marca }}</p>
+  <p><strong>Presentación:</strong> {{ producto.presentacion }}</p>
+  <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+  <p><strong>Instrucciones:</strong> {{ producto.instrucciones }}</p>
+  <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+
+  <p><strong>Tags:</strong>
+    {% for tag in producto.tags.all %}
+      <span style="background:#eef; padding:2px 5px;">{{ tag.nombre }}</span>
+    {% empty %}
+      No tiene tags.
+    {% endfor %}
+  </p>
+
+  <p><strong>Ingredientes:</strong>
+    {% for ingrediente in producto.ingredientes.all %}
+      <span style="background:#efe; padding:2px 5px;">{{ ingrediente.nombre }}</span>
+    {% empty %}
+      No tiene ingredientes.
+    {% endfor %}
+  </p>
+
+  <hr>
+  <h3>Imágenes del producto:</h3>
+  <div style="display: flex; flex-wrap: wrap;">
+    {% for imagen in producto.imagenes.all %}
+      <div style="margin: 5px;">
+        <img src="{{ imagen.imagen.url }}" alt="Imagen" style="width: 150px; border: 1px solid #ccc;">
+      </div>
+    {% empty %}
+      <p>No hay imágenes disponibles.</p>
+    {% endfor %}
+  </div>
+
+{% endblock %}

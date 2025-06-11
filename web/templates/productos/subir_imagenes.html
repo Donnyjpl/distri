@@ -1,0 +1,32 @@
+{% extends 'baset.html' %}
+{% block title %}Subir Imágenes para {{ producto.nombre }}{% endblock %}
+{% block content %}
+{% if messages %}
+<div class=" alert alert-success container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+   <div class="container">     <h1>Subir Imágenes para {{ producto.nombre|title }}</h1>
+   
+    <!-- Formulario para subir imágenes -->
+    <form method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Subir Imagen</button>
+    </form>
+
+    <h2>Imágenes subidas:</h2>
+    <ul>
+        {% for imagen in producto.imagenes.all %}
+            <li><img src="{{ imagen.imagen.url }}" alt="Imagen de {{ producto.nombre }}" width="200"></li>
+        {% endfor %}
+    </ul>
+    
+</div>
+    {% endblock %}
+

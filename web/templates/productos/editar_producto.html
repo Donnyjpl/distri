@@ -1,0 +1,28 @@
+{% extends 'baset.html' %}
+
+
+{% block content %}
+{% if messages %}
+<div class=" alert alert-success container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="text-center">
+      <h1>Editar Producto: {{ producto.nombre }}</h1>
+
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Muestra el formulario de forma ordenada -->
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+      </form>
+
+      <a href="{% url 'detalle_producto' slug=producto.slug %}" class="btn btn-secondary mt-3">Cancelar</a>
+    </div>
+  </div>
+{% endblock %}

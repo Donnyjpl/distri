@@ -1,0 +1,109 @@
+{% extends 'baset.html' %}
+{% load static %}
+
+{% block title %}Acerca de Nosotros - TBK{% endblock %}
+{% block content %}
+<div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="w-100 pt-1 mb-5 text-right">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="" method="get" class="modal-content modal-body border-0 p-0">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
+                <button type="submit" class="input-group-text bg-success text-light">
+                    <i class="fa fa-fw fa-search text-white"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    .justified-text {
+        text-align: justify;
+    }
+    .bg-light-pink {
+        background-color: #fce6ec; /* Color rosado aún más claro */
+    }
+</style>
+
+<section class="bg-light-pink  py-5">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-md-8 ">
+                <h1> Acerca de Nosotros</h1>
+                <p style="text-align: justify;">
+                <strong>The Blonde Ketty</strong> nace de un profundo homenaje a mi madre, Ketty, conocida cariñosamente como "La
+                    Rubia Ketty". Ella amaba la moda y el buen estilo, y su pasión me ha inspirado a lo largo de estos
+                    tres años a crear esta boutique online. Aunque siempre he estado involucrada en el mundo
+                    de la moda, en los últimos tres años he descubierto mi propio deseo de vestir y compartir prendas
+                    con un estilo único.
+                </p>
+
+                <p style="text-align: justify;"></p>Soy Desireé, una emprendedora apasionada que ha dedicado su vida a desarrollar pequeños proyectos
+                que me permitan mostrar productos excepcionales. Mi objetivo es ofrecer no solo moda, sino también
+                una experiencia que refleje mis intereses y estilo de vida.</p>
+
+                <p style="text-align: justify;">En <strong>The Blonde Ketty</strong>, cada prenda es seleccionada con cuidado; si no me enamoro de ella, no la
+                ofrezco. Aquí, comparto mi visión con ustedes, porque esta boutique es tanto de mi madre como mía;
+                diseñada para quienes buscan algo especial.</p>
+
+                <p><strong>¡Bienvenidos a un mundo donde la moda se convierte en una expresión personal!</strong></p>
+            </div>
+            <div class="col-md-4">
+                <img src="{% static 'img/logonegro.png'%}" alt="Logo" style="height: 300px; width: auto; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" class="ms-3 img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Close Banner -->
+
+<!-- Start Section -->
+<section class="container py-5">
+    <div class="row text-center pt-5 pb-3">
+        <div class="col-lg-6 m-auto">
+            <h1 class="h1">Nuestros Servicios</h1>
+            <p>
+                Ofrecemos una variedad de servicios diseñados para mejorar tu experiencia de compra..
+            </p>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fa fa-truck fa-lg"></i></div>
+                <h2 class="h5 mt-4 text-center">Servicios de Entrega</h2>
+                <p class="text-center">Entrega rápida y confiable a tu puerta.</p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fas fa-exchange-alt"></i></div>
+                <h2 class="h5 mt-4 text-center">Envíos y Devoluciones</h2>
+                <p class="text-center">Devoluciones fáciles y opciones de envío rápido.</p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fa fa-percent"></i></div>
+                <h2 class="h5 mt-4 text-center">Promociones</h2>
+                <p class="text-center">Descuentos exclusivos en tus productos favoritos.</p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fa fa-user"></i></div>
+                <h2 class="h5 mt-4 text-center">Atención 24 Horas</h2>
+                <p class="text-center">Nuestro equipo está disponible 24/7 para ayudarte.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Section -->
+
+{% endblock  %}
