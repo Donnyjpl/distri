@@ -38,12 +38,15 @@ SECRET_KEY = "django-insecure-lx)6-@sj%b0%(@p9259uamei2c(nvconbnrjf#3dw$hd5711)&
 DEBUG = True
 
 ALLOWED_HOSTS = []
+LOGIN_URL = '/login/'  # Asegúrate de que esta URL esté definida
+LOGIN_REDIRECT_URL = '/index/'  # Página a la que se redirige después del login
+LOGOUT_REDIRECT_URL = '/index/'  # Página a la que se redirige después del logout
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'web',
+    'web','compras',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

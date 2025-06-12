@@ -28,3 +28,4 @@ __pycache__/
 # Archivos de caché o temporales
 .DS_Store
 Thumbs.db
+/media/

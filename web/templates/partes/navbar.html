@@ -45,13 +45,13 @@
                         <a class="nav-link" href="{% url 'index' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Acerca de Nosotros</a>
+                        <a class="nav-link" href="{% url 'about' %}">Acerca de Nosotros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Tienda</a>
+                        <a class="nav-link" href="{% url 'shop' %}">Tienda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
+                        <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
                     </li>
                     {% if user.is_superuser %}
                     <li class="nav-item">
@@ -61,7 +61,7 @@
 		    {% if user.is_authenticated %}
                     	{% if not user.is_superuser %}
 		    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mis_compras' %}">Mis Compras</a>
+                        <a class="nav-link" href="#">Mis Compras</a>
                     </li>
 			{% endif %}
                     {% endif %}
@@ -74,9 +74,12 @@
                             <a class="nav-link" href="{% url 'listar' %}">Lista de Productos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'color_list' %}">Gestionar Color</a>
+                            <a class="nav-link" href="{% url 'tag_list' %}">Gestionar Tag</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'ingrediente_list' %}">Gestionar Ingrediente</a>
+                        </li>
+                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'categoria_list' %}">Gestionar Categoria</a>
                         </li>
 
@@ -88,7 +91,7 @@
 
             <div class="navbar align-self-center d-flex">
                 <!-- Ícono de Favoritos -->
-                <a class="nav-icon position-relative text-decoration-none" href="#">
+                <a class="nav-icon position-relative text-decoration-none" href="{% url 'ver_favoritos' %}">
                     <i class="fa fa-fw fa-heart text-dark mr-1"></i>
                     <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">
                         {{ cantidad_favoritos }}

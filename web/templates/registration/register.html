@@ -104,13 +104,15 @@
         {% endif %}
     </div>
 
-    <div class="mb-3" id="rut-field"><label for="id_rut" class="form-label">RUT:</label>
-        {{ form.rut|add_class:"form-control" }}
-        {% if form.rut.errors %}
-        <small id="rutHelp" class="form-text text-muted">Formato: 12.345.678-9 o 12.345.678-K</small>
-        <div class="text-danger">{{ form.rut.errors }}</div>
-        {% endif %}
-    </div>
+    <div class="mb-3" id="dni-field">
+    <label for="id_dni" class="form-label">DNI:</label>
+    {{ form.dni|add_class:"form-control" }}
+    {% if form.dni.errors %}
+    <small id="dniHelp" class="form-text text-muted">Formato: 12345678</small>
+    <div class="text-danger">{{ form.dni.errors }}</div>
+    {% endif %}
+</div>
+
 
     <button type="submit" class="btn btn-success w-100 mt-3">Registrar</button>
     </form>

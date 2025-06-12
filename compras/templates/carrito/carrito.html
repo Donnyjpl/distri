@@ -1,0 +1,119 @@
+{% extends 'baset.html' %}
+{% load custom_filters %}
+{% block content %}
+
+{% if messages %}
+<div class="alert alert-success container">
+    {% for message in messages %}
+    <p>{{ message|title }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container py-5">
+    <h2>Mi Carrito de Compras</h2>
+
+    {% if carrito.items.count == 0 %}
+    <div class="alert alert-info">
+        ¡Tu carrito está vacío! <a href="{% url 'shop' %}">Visita nuestra tienda</a> para agregar productos.
+    </div>
+    {% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in carrito.items.all %}
+            <tr>
+                <td>{{ item.producto.nombre|title }}</td>
+                <td>
+                    <form method="POST" action="{% url 'actualizar_producto_simple' slug=item.producto.slug %}">
+                        {% csrf_token %}
+                        <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" required class="form-control form-control-sm d-inline" style="width: 70px;">
+                        <button type="submit" class="btn btn-sm btn-warning">Actualizar</button>
+                    </form>
+                </td>
+                <td>S/. {{ item.producto.precio|formatear_precio }}</td>
+                <td>S/. {{ item.subtotal|formatear_precio }}</td>
+                <td>
+                    <a href="{% url 'eliminar_producto_carrito' slug=item.producto.slug %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="POST" action="{% url 'actualizar_envio' %}" class="form-inline mb-4">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="envio" class="mr-2">Selecciona una opción de envío:</label>
+            <select name="envio" id="envio" class="form-control form-control-sm" onchange="this.form.submit()">
+                <option value="centro" {% if envio == 'centro' %}selected{% endif %}>Centro (S/. 5)</option>
+                <option value="provincia" {% if envio == 'provincia' %}selected{% endif %}>Provincia (S/. 20)</option>
+                <option value="retiro" {% if envio == 'retiro' %}selected{% endif %}>Retiro en tienda</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Resumen de la compra</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Subtotal:</strong> S/. {{ carrito.total|formatear_precio }}</p>
+                    <p><strong>Costo de Envío:</strong>
+                        {% if envio == 'centro' %} S/. 5
+                        {% elif envio == 'provincia' %} S/. 20
+                        {% else %} S/. 0 (Retiro en tienda)
+                        {% endif %}
+                    </p>
+                    <hr>
+                    <h4>Total: S/. {{ total|formatear_precio }}</h4>
+                </div>
+                <div class="col-md-6">
+                    {% if user.is_authenticated %}
+                    <form method="post" id="paymentForm" action="#" class="mt-3">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="payment_method"><strong>Método de pago:</strong></label>
+                            <select name="payment_method" id="payment_method" class="form-control mb-3" disabled>
+                                <option value="mercado_pago">Mercado Pago</option>
+                                <option value="transferencia">Transferencia Bancaria</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-lg btn-success btn-block" disabled>Proceder al pago (pendiente)</button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <p>Para proceder con el pago, por favor, inicie sesión o regístrese.</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary">Registrarse</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script>
+    function updateFormAction() {
+        var paymentMethod = document.getElementById('payment_method').value;
+        var form = document.getElementById('paymentForm');
+        
+        if (paymentMethod == 'transferencia') {
+            form.action = "#";  // Cambia la acción para Transferencia
+        } else {
+            form.action = "#";  // Acción para Mercado Pago
+        }
+    }
+</script
+{% endblock %}

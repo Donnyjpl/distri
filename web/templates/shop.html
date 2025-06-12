@@ -1,6 +1,5 @@
 {% extends 'baset.html' %}
 {% load custom_filters %}
-{% block title %}TBK-shop{% endblock %}
 
 {% block content %}
 {% load static %}
@@ -11,7 +10,6 @@
     {% endfor %}
 </div>
 {% endif %}
-
 
 <!-- Start Content -->
 <div class="container py-5">
@@ -73,21 +71,22 @@
                                         href="{% url 'agregar_a_favoritos' slug=producto.slug %}">
                                         <i class="far fa-heart text-danger"></i>
                                     </a>
-                                    <a class="tbk-action-btn" title="Ver detalles"
-                                        href="{% url 'producto_detalle' slug=producto.slug %}">
-                                        <i class="far fa-eye text-primary"></i>
-                                    </a>
                                     <a class="tbk-action-btn" title="Añadir al carrito"
                                         href="{% url 'agregar_al_carrito' slug=producto.slug %}">
                                         <i class="fas fa-cart-plus text-success"></i>
                                     </a>
+                                    <a class="tbk-action-btn" title="Ver detalles"
+                                        href="{% url 'detalle_producto' slug=producto.slug %}">
+                                        <i class="far fa-eye text-primary"></i>
+                                    </a>
+                                    
                                 </div>
                             </div>
                         </div>
 
                         <!-- Contenido de la card -->
                         <div class="card-body d-flex flex-column">
-                            <a href="{% url 'producto_detalle' producto.slug %}" class="tbk-product-title">
+                            <a href="{% url 'detalle_producto' producto.slug %}" class="tbk-product-title">
                                 {{ producto.nombre|title }}
                             </a>
 
@@ -106,40 +105,21 @@
                                     {{ producto.opiniones_list.count }} Reseñas
                                 </span>
                             </div>
-
-                            <!-- Tallas disponibles con diseño mejorado -->
-                            <div class="tbk-product-sizes">
-                                <span class="tbk-size-label">Tallas:</span>
-                                <div class="tbk-size-badges">
-                                    {% if producto.tallas.all %}
-                                    {% for producto_talla in producto.tallas.all %}
-                                    <span class="tbk-size-badge">{{ producto_talla.talla|upper }}</span>
-                                    {% endfor %}
-                                    {% else %}
-                                    <span class="text-danger small">No disponible</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
                             <!-- Precio con diseño destacado -->
                             <div class="tbk-product-footer">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         {% if producto.tiene_descuento %}
                                             <div class="price-container">
-                                                <span class="tbk-product-price">${{ producto.precio_con_descuento|formatear_precio }}</span>
-                                                <span class="text-decoration-line-through text-muted ms-2 fs-6">${{ producto.precio|formatear_precio }}</span>
+                                                <span class="tbk-product-price">S/. {{ producto.precio_con_descuento }}</span>
+                                                <span class="text-decoration-line-through text-muted ms-2 fs-6">S/. {{ producto.precio }}</span>
                                                 <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
                                             </div>
                                         {% else %}
-                                            <span class="tbk-product-price">${{ producto.precio|formatear_precio }}</span>
+                                            <span class="tbk-product-price">S/. {{ producto.precio }}</span>
                                         {% endif %}
                                     </div>
-                                    <div class="col-auto">
-                                        <a href="{% url 'agregar_al_carrito' slug=producto.slug %}" class="tbk-buy-button">
-                                            <i class="fas fa-shopping-cart me-1"></i> Comprar
-                                        </a>
-                                    </div>
+                                   
                                 </div>
                             </div>
                         </div>

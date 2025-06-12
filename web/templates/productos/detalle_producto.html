@@ -1,46 +1,447 @@
-{% extends "baset.html" %}
+{% extends 'baset.html' %}
 {% load static %}
+{% load custom_filters %}
+
+{% block title %}
+{{ producto.nombre|title }}
+{% endblock %}
+
 {% block content %}
-  <h2>{{ producto.nombre }} ({{ producto.sku }})</h2>
-
-  <p><strong>Precio:</strong> ${{ producto.precio_con_descuento }}
-     {% if producto.tiene_descuento %}
-        <span style="color:red;">(Descuento: {{ producto.descuento }}%)</span>
-     {% endif %}
-  </p>
-
-  <p><strong>Marca:</strong> {{ producto.marca }}</p>
-  <p><strong>Presentación:</strong> {{ producto.presentacion }}</p>
-  <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
-  <p><strong>Instrucciones:</strong> {{ producto.instrucciones }}</p>
-  <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
-
-  <p><strong>Tags:</strong>
-    {% for tag in producto.tags.all %}
-      <span style="background:#eef; padding:2px 5px;">{{ tag.nombre }}</span>
-    {% empty %}
-      No tiene tags.
+{% if messages %}
+<div class="alert alert-success container">
+    {% for message in messages %}
+    <p>{{ message|title }}</p>
     {% endfor %}
-  </p>
+</div>
+{% endif %}
 
-  <p><strong>Ingredientes:</strong>
-    {% for ingrediente in producto.ingredientes.all %}
-      <span style="background:#efe; padding:2px 5px;">{{ ingrediente.nombre }}</span>
-    {% empty %}
-      No tiene ingredientes.
-    {% endfor %}
-  </p>
+<section class="bg-light">
+    <div class="container pb-5">
+        <div class="row">
 
-  <hr>
-  <h3>Imágenes del producto:</h3>
-  <div style="display: flex; flex-wrap: wrap;">
-    {% for imagen in producto.imagenes.all %}
-      <div style="margin: 5px;">
-        <img src="{{ imagen.imagen.url }}" alt="Imagen" style="width: 150px; border: 1px solid #ccc;">
-      </div>
-    {% empty %}
-      <p>No hay imágenes disponibles.</p>
-    {% endfor %}
-  </div>
+            <!-- Imagen principal -->
+            <div class="col-lg-5 mt-5">
+                <div class="card mb-3">
+                    <div class="img-container position-relative">
+                        {% if producto.imagenes.all %}
+                        <img class="card-img img-fluid" src="{{ producto.imagenes.first.imagen.url }}"
+                            alt="{{ producto.nombre }}" id="product-detail">
+                        <div class="zoom-icon position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-sm btn-light"
+                                onclick="openZoomModal('{{ producto.imagenes.first.imagen.url }}')">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                        {% else %}
+                        <p>No hay imagen disponible.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Miniaturas -->
+                {% if producto.imagenes.all|length > 1 %}
+                <div class="row thumbnails-container">
+                    {% for imagen in producto.imagenes.all %}
+                    <div class="col-4 thumbnail-col">
+                        <div class="thumbnail-item" onclick="changeMainImage('{{ imagen.imagen.url }}')">
+                            <img src="{{ imagen.imagen.url }}" alt="Miniatura {{ forloop.counter }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Detalles -->
+            <div class="col-lg-7 mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="h2 fw-bold">{{ producto.nombre|title }}</h1>
+
+                        <!-- Precio -->
+                        <div class="pricing py-2">
+                            {% if producto.tiene_descuento %}
+                            <div class="d-flex align-items-center">
+                                <p class="h3 text-success me-2">S/. {{ producto.precio_con_descuento|formatear_precio }}
+                                </p>
+                                <p class="h5 text-muted text-decoration-line-through">
+                                    ${{ producto.precio|formatear_precio }}</p>
+                                <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
+                            </div>
+                            {% else %}
+                            <p class="h3 py-2">S/. {{ producto.precio|formatear_precio }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Presentación -->
+                        {% if producto.presentacion %}
+                        <p><strong>Presentación:</strong> {{ producto.presentacion }}</p>
+                        {% endif %}
+
+                        <!-- Ingredientes -->
+                        {% if producto.ingredientes.exists %}
+                        <p><strong>Ingredientes:</strong> {{ producto.ingredientes.all|join:", " }}</p>
+                        {% endif %}
+
+                        <!-- Instrucciones -->
+                        {% if producto.instrucciones %}
+                        <p><strong>Instrucciones:</strong><br>{{ producto.instrucciones|linebreaks }}</p>
+                        {% endif %}
+
+                        <!-- Formulario de carrito -->
+
+                        <!-- Tabs -->
+                        <ul class="nav nav-tabs" id="productTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description"
+                                    role="tab">Descripción</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews"
+                                    role="tab">Opiniones</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content pt-3" id="productTabContent">
+                            <div class="tab-pane fade show active" id="description" role="tabpanel">
+                                {{ producto.descripcion|linebreaks }}
+                            </div>
+
+                            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                                {% if user.is_authenticated and not usuario_tiene_opinion %}
+                                <div class="mb-4">
+                                    <h4>Deja tu opinión</h4>
+                                    <form method="POST" action="{% url 'producto_opinion' slug=producto.slug %}">
+                                        {% csrf_token %}
+                                        {{ opinion_form.as_p }}
+                                        <button type="submit" class="btn btn-primary">Enviar opinión</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+
+                                <div class="reviews-list">
+                                    {% for opinion in producto.opiniones.all %}
+                                    <div class="review-item mb-3 pb-3 border-bottom">
+                                        <h5>{{ opinion.user.get_full_name|default:opinion.user.username }}</h5>
+                                        <div class="stars">
+                                            {% for i in rango_estrellas %}
+                                            <i
+                                                class="fa fa-star {% if i <= opinion.valoracion %}text-warning{% else %}text-muted{% endif %}"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <p>{{ opinion.opinion }}</p>
+                                        <small class="text-muted">{{ opinion.created_at|date:"d/m/Y" }}</small>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted">No hay opiniones aún.</p>
+                                    {% endfor %}
+                                </div>
+
+
+                            </div>
+                            <form id="addToCartForm" method="POST"
+                                action="{% url 'agregar_al_carrito' slug=producto.slug %}">
+                                {% csrf_token %}
+                                <div class="form-group mb-3">
+                                    <label for="cantidad">Cantidad:</label>
+                                    <input type="number" name="cantidad" id="cantidad" value="1" min="1"
+                                        class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-success mb-3">Agregar al carrito</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Zoom -->
+            <div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ producto.nombre }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="zoomedImage" class="img-fluid" src="" alt="Zoom">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Relacionados -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center mb-4">Productos Relacionados</h3>
+        <div class="row">
+            {% for related_product in productos_relacionados %}
+            <div class="col-md-3 col-6 mb-4">
+                <div class="card tbk-product-card related-product-card">
+                    <div class="tbk-product-img-container">
+                        {% if related_product.imagenes.all %}
+                        <img class="tbk-product-img related-product-img"
+                            src="{{ related_product.imagenes.first.imagen.url }}" alt="{{ related_product.nombre }}">
+                        {% else %}
+                        <img class="tbk-product-img" src="{% static 'images/no-image.png' %}" alt="No disponible">
+                        {% endif %}
+
+                        <div class="tbk-product-overlay">
+                            <div class="tbk-product-actions">
+                                <a href="{% url 'detalle_producto' slug=related_product.slug %}" title="Ver">
+                                    <i class="far fa-eye text-primary"></i>
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5>{{ related_product.nombre }}</h5>
+                        {% if related_product.tiene_descuento %}
+                        <div>
+                            <span
+                                class="text-success fw-bold">S/.{{ related_product.precio_con_descuento|formatear_precio }}</span>
+                            <span
+                                class="text-muted text-decoration-line-through">S/.{{ related_product.precio|formatear_precio }}</span>
+                        </div>
+                        {% else %}
+                        <span>S/.{{ related_product.precio|formatear_precio }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center text-muted">No hay productos relacionados disponibles.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Contenedor principal de miniaturas */
+    .thumbnails-container {
+        margin-top: 15px;
+    }
+
+    /* Controles del carrusel */
+    .carousel-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+    }
+
+    .carousel-control:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mejorar la fila de miniaturas */
+    .thumbnail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        margin: 0 -5px;
+        /* Compensar el padding de las columnas */
+    }
+
+    /* Columnas para cada miniatura */
+    .thumbnail-col {
+        padding: 0 5px;
+        margin-bottom: 10px;
+        width: 33.333%;
+    }
+
+    /* Contenedor de la miniatura */
+    .thumbnail-item {
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: all 0.2s;
+        padding-top: 100%;
+        /* Relación de aspecto 1:1 */
+        position: relative;
+        overflow: hidden;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .thumbnail-item:hover {
+        border-color: #0d6efd;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Imagen dentro de la miniatura */
+    .thumbnail-item img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        object-fit: contain;
+        /* Muestra la imagen completa dentro del contenedor */
+    }
+
+    /* Botón de zoom */
+    .zoom-icon {
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .zoom-icon:hover {
+        opacity: 1;
+    }
+
+    /* Contenedor de la imagen principal */
+    .img-container {
+        width: 100%;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: white;
+        border-radius: 4px;
+        padding: 0;
+        /* Eliminar el padding */
+    }
+
+    .img-container img {
+        max-height: 100%;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* Carrusel */
+    .carousel-inner {
+        padding: 0;
+    }
+
+    /* Imagen en el modal */
+    #zoomedImage {
+        max-height: 80vh;
+    }
+
+    /* Asegurar que el carrusel ocupe todo el ancho disponible */
+    #thumbnails-carousel {
+        padding: 0;
+    }
+
+    /* Evitar bordes blancos en las miniaturas */
+    .img-thumbnail {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar los colores si hay una talla seleccionada
+        const tallaSelect = document.getElementById('talla');
+        if (tallaSelect && tallaSelect.value) {
+            updateColors();
+        }
+    });
+
+    // Función para cambiar la imagen principal
+    function changeMainImage(imageUrl) {
+        const mainImage = document.getElementById('product-detail');
+        mainImage.src = imageUrl;
+
+        // Actualizar también el botón de zoom
+        const zoomButton = document.querySelector('.zoom-icon button');
+        zoomButton.setAttribute('onclick', `openZoomModal('${imageUrl}')`);
+    }
+
+    // Función para abrir el modal con la imagen ampliada
+    function openZoomModal(imageUrl) {
+        const zoomedImage = document.getElementById('zoomedImage');
+        zoomedImage.src = imageUrl;
+
+        const zoomModal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+        zoomModal.show();
+    }
+
+    function updateColors() {
+        const tallaId = document.getElementById('talla').value;
+        const colorSelect = document.getElementById('color');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Reset color select
+        colorSelect.innerHTML = '<option value="">Cargando colores...</option>';
+
+        if (!tallaId) {
+            colorSelect.innerHTML = '<option value="">Selecciona primero una talla</option>';
+            return;
+        }
+
+        // Usar la URL absoluta para evitar problemas de ruta
+        fetch('/producto/get_colores/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `talla=${tallaId}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error en la respuesta: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // Ver qué llega en el backend
+                colorSelect.innerHTML = '';
+
+                if (data.colores && data.colores.length > 0) {
+                    colorSelect.innerHTML = '<option value="">Selecciona un color</option>';
+                    data.colores.forEach(color => {
+                        const option = document.createElement('option');
+                        option.value = color.id;
+                        option.textContent = color.nombre;
+                        colorSelect.appendChild(option);
+                    });
+                } else {
+                    colorSelect.innerHTML = '<option value="">No hay colores disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                colorSelect.innerHTML = '<option value="">Error al cargar colores</option>';
+            });
+    }
+
+    // Validación del formulario
+    document.getElementById('addToCartForm').addEventListener('submit', function (e) {
+        const talla = document.getElementById('talla').value;
+        const color = document.getElementById('color').value;
+
+        if (!talla || !color) {
+            e.preventDefault();
+            alert('Por favor selecciona una talla y un color');
+        }
+    });
+</script>
 
 {% endblock %}
