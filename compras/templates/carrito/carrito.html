@@ -54,7 +54,7 @@
         <div class="form-group mb-3">
             <label for="envio" class="mr-2">Selecciona una opción de envío:</label>
             <select name="envio" id="envio" class="form-control form-control-sm" onchange="this.form.submit()">
-                <option value="centro" {% if envio == 'centro' %}selected{% endif %}>Centro (S/. 5)</option>
+                <option value="centro" {% if envio == 'centro' %}selected{% endif %}> Lima Metropolita (S/. 10)</option>
                 <option value="provincia" {% if envio == 'provincia' %}selected{% endif %}>Provincia (S/. 20)</option>
                 <option value="retiro" {% if envio == 'retiro' %}selected{% endif %}>Retiro en tienda</option>
             </select>
@@ -70,8 +70,8 @@
                 <div class="col-md-6">
                     <p><strong>Subtotal:</strong> S/. {{ carrito.total|formatear_precio }}</p>
                     <p><strong>Costo de Envío:</strong>
-                        {% if envio == 'centro' %} S/. 5
-                        {% elif envio == 'provincia' %} S/. 20
+                        {% if envio == 'centro' %} S/. 10
+                        {% elif envio == 'provincia' %} S/. 15
                         {% else %} S/. 0 (Retiro en tienda)
                         {% endif %}
                     </p>

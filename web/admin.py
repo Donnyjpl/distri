@@ -1,10 +1,17 @@
 from django.contrib import admin
-from .models import Categoria, Tag, Ingrediente, Producto, ProductoImagen
+from .models import Categoria, Tag, Ingrediente, Producto, ProductoImagen,OpinionCliente
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre')
     search_fields = ('nombre',)
+    
+    
+@admin.register(OpinionCliente)
+class OpinionClienteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'producto', 'user', 'opinion', 'valoracion', 'created_at')
+    search_fields = ('producto__nombre', 'user__username', 'opinion')
+    list_filter = ('valoracion', 'created_at')
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

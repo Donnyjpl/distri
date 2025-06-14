@@ -37,7 +37,7 @@ urlpatterns = [
     path('producto/', lista_productos, name='listar'),  # URL para ver la lista de productos
     
     
-    path('shop/', views.ProductoListView.as_view(), name='shop'),  # URL para ver la lista de productos
+    path('shop/', views.shop, name='shop'),  # URL para ver la lista de productos
     
     
     

@@ -7,6 +7,7 @@ from .models import Carrito, ItemCarrito
 from django.contrib import messages
 from django.shortcuts import redirect
 
+
 @login_required
 def ver_carrito(request):
     carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
@@ -15,9 +16,9 @@ def ver_carrito(request):
     envio = request.session.get('envio', 'retiro')
 
     if envio == 'centro':
-        costo_envio = 5
+        costo_envio = 10
     elif envio == 'provincia':
-        costo_envio = 20
+        costo_envio = 15
     else:  # retiro en tienda
         costo_envio = 0
 

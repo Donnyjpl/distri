@@ -79,7 +79,7 @@
                                         href="{% url 'detalle_producto' slug=producto.slug %}">
                                         <i class="far fa-eye text-primary"></i>
                                     </a>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -90,36 +90,37 @@
                                 {{ producto.nombre|title }}
                             </a>
 
-                            <!-- Valoraciones con estrellas -->
-                            <div class="tbk-product-rating">
-                                <div class="tbk-product-stars">
+                            <!-- Rating -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="stars me-2">
                                     {% for i in rango_estrellas %}
-                                    {% if i <= producto.promedio_valoracion %}
-                                    <i class="fas fa-star text-warning"></i>
-                                    {% else %}
-                                    <i class="far fa-star text-muted"></i>
-                                    {% endif %}
+                                    <i
+                                        class="fa fa-star {% if i <= producto.promedio_valoracion %}text-warning{% else %}text-muted{% endif %}"></i>
                                     {% endfor %}
                                 </div>
-                                <span class="tbk-product-reviews">
-                                    {{ producto.opiniones_list.count }} Reseñas
+                                <span class="text-muted">
+                                    {{ producto.promedio_valoracion|default:0|floatformat:1 }} de 5
+                                    ({{ producto.cantidad_opiniones }} opiniones)
                                 </span>
                             </div>
+
                             <!-- Precio con diseño destacado -->
                             <div class="tbk-product-footer">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         {% if producto.tiene_descuento %}
-                                            <div class="price-container">
-                                                <span class="tbk-product-price">S/. {{ producto.precio_con_descuento }}</span>
-                                                <span class="text-decoration-line-through text-muted ms-2 fs-6">S/. {{ producto.precio }}</span>
-                                                <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
-                                            </div>
+                                        <div class="price-container">
+                                            <span class="tbk-product-price">S/.
+                                                {{ producto.precio_con_descuento }}</span>
+                                            <span class="text-decoration-line-through text-muted ms-2 fs-6">S/.
+                                                {{ producto.precio }}</span>
+                                            <span class="badge bg-danger ms-2">-{{ producto.descuento }}%</span>
+                                        </div>
                                         {% else %}
-                                            <span class="tbk-product-price">S/. {{ producto.precio }}</span>
+                                        <span class="tbk-product-price">S/. {{ producto.precio }}</span>
                                         {% endif %}
                                     </div>
-                                   
+
                                 </div>
                             </div>
                         </div>

@@ -221,10 +221,18 @@ def detalle_producto(request, slug):
         Q(tags__in=producto.tags.all()),
         activo=True
     ).exclude(id=producto.id).distinct()[:4]
+    
+    opiniones = producto.opiniones.select_related('user').order_by('-created_at')
+    promedio_valoracion = opiniones.aggregate(promedio=Avg('valoracion'))['promedio'] or 0
+
 
     return render(request, 'productos/detalle_producto.html', {
         'producto': producto,
-        'productos_relacionados': relacionados
+        'productos_relacionados': relacionados,
+        'opiniones': opiniones,
+        'producto_opiniones_count': opiniones.count(),
+        'producto_promedio_valoracion': promedio_valoracion,
+        'rango_estrellas': range(1, 6)
     })
 
 @user_passes_test(es_superusuario)
@@ -306,45 +314,55 @@ def lista_productos(request):
         # 'form': form,  # Descomenta si usas filtro
     })
       
-class ProductoListView(ListView):
-    model = Producto
-    template_name = 'shop.html'
-    context_object_name = 'productos'
-    paginate_by = 30
+      
+from django.db.models import Avg, Count
 
-    def get_queryset(self):
-        queryset = Producto.objects.filter(activo=True).order_by('nombre')
-        queryset = queryset.prefetch_related('imagenes', 'tags', 'categoria')
-
-        form = ProductoFilterForm(self.request.GET)
-        if form.is_valid():
-            nombre = form.cleaned_data.get('nombre')
-            categoria = form.cleaned_data.get('categoria')
-            tags = form.cleaned_data.get('tags')
-
-            if nombre:
-                queryset = queryset.filter(nombre__icontains=nombre)
-            if categoria:
-                queryset = queryset.filter(categoria=categoria)
-            if tags:
-                for tag in tags:
-                    queryset = queryset.filter(tags=tag)
-
-        order_by = self.request.GET.get('order_by', 'nombre')
-        if order_by == 'name':
-            queryset = queryset.order_by('nombre')
-        elif order_by == 'item':
-            queryset = queryset.order_by('slug')
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = ProductoFilterForm(self.request.GET)
-        context['rango_estrellas'] = range(1, 6)
-        return context
+def shop(request):
+    queryset = Producto.objects.filter(activo=True).prefetch_related('imagenes', 'tags', 'categoria')
     
-    
+    # Anotaciones: promedio y conteo de opiniones
+    queryset = queryset.annotate(
+        promedio_valoracion=Avg('opiniones__valoracion'),
+        cantidad_opiniones=Count('opiniones')
+    )
+
+    # Filtrado con formulario
+    form = ProductoFilterForm(request.GET)
+    if form.is_valid():
+        nombre = form.cleaned_data.get('nombre')
+        categoria = form.cleaned_data.get('categoria')
+        tags = form.cleaned_data.get('tags')
+
+        if nombre:
+            queryset = queryset.filter(nombre__icontains=nombre)
+        if categoria:
+            queryset = queryset.filter(categoria=categoria)
+        if tags:
+            for tag in tags:
+                queryset = queryset.filter(tags=tag)
+
+    # Ordenamiento
+    order_by = request.GET.get('order_by', 'nombre')
+    if order_by == 'name':
+        queryset = queryset.order_by('nombre')
+    elif order_by == 'item':
+        queryset = queryset.order_by('slug')
+    else:
+        queryset = queryset.order_by('nombre')
+
+    # Paginación
+    paginator = Paginator(queryset, 30)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template con contexto
+    return render(request, 'shop.html', {
+        'productos': page_obj,
+        'form': form,
+        'rango_estrellas': range(1, 6),
+        'page_obj': page_obj,  # para soporte de paginación en el template
+        'is_paginated': page_obj.has_other_pages(),  # opcional
+    })
     
     #####favoritos
 def agregar_a_favoritos(request, slug):
@@ -408,22 +426,28 @@ def actualizar_favoritos(request, slug):
 
     return redirect('ver_favoritos')  # Redirige a la vista de favoritos
 
+
 @login_required    
 def dejar_opinion(request, slug):
-    producto = get_object_or_404(Producto, slug=slug)  # Obtener el producto por su slug
+    producto = get_object_or_404(Producto, slug=slug)
+    usuario = request.user
+
+    # Verificar si ya existe opinión del usuario para este producto
+    existe_opinion = OpinionCliente.objects.filter(producto=producto, user=usuario).exists()
+
+    if existe_opinion:
+        messages.warning(request, 'Ya has dejado una opinión para este producto.')
+        return redirect('detalle_producto', slug=producto.slug)
 
     if request.method == 'POST':
         form = OpinionClienteForm(request.POST)
         if form.is_valid():
-            # Asignar el producto y el usuario a la opinión
             opinion = form.save(commit=False)
-            opinion.producto = producto  # Asociar la opinión con el producto
-            opinion.user = request.user  # Asignar el usuario autenticado
-            opinion.save()  # Guardar la opinión
-
-            # Mensaje de éxito
+            opinion.producto = producto
+            opinion.user = usuario
+            opinion.save()
             messages.success(request, '¡Gracias por tu opinión!')
-            return redirect('detalle_producto', slug=producto.slug)  # Redirigir a la página del producto
+            return redirect('detalle_producto', slug=producto.slug)
     else:
         form = OpinionClienteForm()
 
@@ -431,7 +455,6 @@ def dejar_opinion(request, slug):
         'form': form,
         'producto': producto
     })
-    
     
 def about(request):
     return render(request, 'about.html')

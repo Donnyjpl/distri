@@ -77,6 +77,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # 👇 Agrega esta línea
+               'web.context_processors.categorias_y_datos_adicionales',
             ],
         },
     },

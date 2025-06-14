@@ -73,6 +73,21 @@
                             {% endif %}
                         </div>
 
+                        <!-- Rating -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stars me-2">
+                                {% for i in rango_estrellas %}
+                                <i
+                                    class="fa fa-star {% if i <= producto_promedio_valoracion %}text-warning{% else %}text-muted{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="text-muted">
+                                {{ producto_promedio_valoracion|floatformat:1 }} de 5
+                                ({{ producto_opiniones_count }} opiniones)
+                            </span>
+                        </div>
+
+
                         <!-- Presentación -->
                         {% if producto.presentacion %}
                         <p><strong>Presentación:</strong> {{ producto.presentacion }}</p>
@@ -149,7 +164,6 @@
                                 </div>
                                 <button type="submit" class="btn btn-success mb-3">Agregar al carrito</button>
                             </form>
-
                         </div>
                     </div>
                 </div>
